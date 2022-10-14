@@ -2,6 +2,9 @@ import numpy as np
 import pygame
 import sys
 import math
+import os
+from copy import copy
+from time import time
  
 BLUE = (0,0,255)
 BLACK = (0,0,0)
@@ -67,10 +70,19 @@ def draw_board(board):
             elif board[r][c] == 2: 
                 pygame.draw.circle(screen, YELLOW, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
     pygame.display.update()
+
+def save_game_data(moves):
+    if not os.path.exists('data'):
+        os.mkdir('data')
+
+    path = os.path.join('data', str(time()))
+    np.save(path, moves)
  
  
 board = create_board()
-print_board(board)
+moves = []
+moves.append(copy(board))
+#print_board(board)
 game_over = False
 turn = 0
  
@@ -142,11 +154,14 @@ while not game_over:
                         screen.blit(label, (40,10))
                         game_over = True
  
-            print_board(board)
+            #print_board(board)
+            moves.append(copy(board))
             draw_board(board)
  
             turn += 1
             turn = turn % 2
  
             if game_over:
+                print(np.array(moves))
+                save_game_data(moves)
                 pygame.time.wait(3000)
